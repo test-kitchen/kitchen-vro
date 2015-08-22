@@ -101,8 +101,8 @@ module Kitchen
 
         validate_create_output_parameters!
 
-        state[:server_id] = output_parameters['server_id'].value
-        state[:hostname]  = output_parameters['ip_address'].value
+        state[:server_id] = output_parameter_value('server_id')
+        state[:hostname]  = output_parameter_value('ip_address')
       end
 
       def execute_destroy_workflow(state)
@@ -157,15 +157,20 @@ module Kitchen
         @output_parameters ||= vro_client.token.output_parameters
       end
 
+      def output_parameter_value(key)
+        output_parameters[key].value.to_s
+      end
+
+      def output_parameter_empty?(key)
+        output_parameter_value(key).nil? || output_parameter_value(key).empty?
+      end
+
       def validate_create_output_parameters!
         raise 'The workflow output did not contain a server_id and ip_address parameter.' unless
           output_parameters.key?('server_id') && output_parameters.key?('ip_address')
 
-        server_id = output_parameters['server_id'].value.to_s
-        raise 'The server_id parameter was empty.' if server_id.nil? || server_id.empty?
-
-        ip_address = output_parameters['ip_address'].value.to_s
-        raise 'The ip_address parameter was empty.' if ip_address.nil? || ip_address.empty?
+        raise 'The server_id parameter was empty.' if output_parameter_empty?('server_id')
+        raise 'The ip_address parameter was empty.' if output_parameter_empty?('ip_address')
       end
 
       def workflow_successful?

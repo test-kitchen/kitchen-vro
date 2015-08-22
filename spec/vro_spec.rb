@@ -22,6 +22,16 @@ require 'kitchen/provisioner/dummy'
 require 'kitchen/transport/dummy'
 require 'kitchen/verifier/dummy'
 
+shared_examples 'output parameters that are missing a required key' do
+  it 'raises an exception' do
+    allow(driver).to receive(:output_parameters).and_return(output_parameters)
+    expect { driver.validate_create_output_parameters! }.to raise_error(
+      RuntimeError,
+      'The workflow output did not contain a server_id and ip_address parameter.'
+    )
+  end
+end
+
 describe Kitchen::Driver::Vro do
   let(:logged_output) { StringIO.new }
   let(:logger)        { Logger.new(logged_output) }
@@ -186,7 +196,7 @@ describe Kitchen::Driver::Vro do
   end
 
   describe '#execute_destroy_workflow' do
-    let(:state)      { { server_id: 'server-12345'} }
+    let(:state)      { { server_id: 'server-12345' } }
     let(:vro_client) { double('vro_client') }
 
     before do
@@ -323,6 +333,130 @@ describe Kitchen::Driver::Vro do
       expect(vro_client).to receive(:parameter).with('key2', 'value2')
 
       driver.set_workflow_parameters(params)
+    end
+  end
+
+  describe '#output_parameters' do
+    let(:vro_client) { double('vro_client') }
+    let(:token)      { double('token') }
+    let(:output)     { double('output_parameters') }
+
+    it 'returns the output parameters from the workflow token' do
+      allow(driver).to receive(:vro_client).and_return(vro_client)
+      allow(vro_client).to receive(:token).and_return(token)
+      expect(token).to receive(:output_parameters).and_return(output)
+      expect(driver.output_parameters).to eq(output)
+    end
+  end
+
+  describe '#output_parameter_value' do
+    let(:test_key) { double('test_key', value: 'test_value') }
+    let(:output_parameters) { { 'test_key' => test_key } }
+    it 'returns the correct value' do
+      allow(driver).to receive(:output_parameters).and_return(output_parameters)
+      expect(driver.output_parameter_value('test_key')).to eq('test_value')
+    end
+  end
+
+  describe '#output_parameter_empty?' do
+    context 'when the value is not nil or empty' do
+      it 'returns false' do
+        allow(driver).to receive(:output_parameter_value).with('test_key').and_return('test_value')
+        expect(driver.output_parameter_empty?('test_key')).to eq(false)
+      end
+    end
+
+    context 'when the value is nil' do
+      it 'returns true' do
+        allow(driver).to receive(:output_parameter_value).with('test_key').and_return(nil)
+        expect(driver.output_parameter_empty?('test_key')).to eq(true)
+      end
+    end
+
+    context 'when the value is empty' do
+      it 'returns true' do
+        allow(driver).to receive(:output_parameter_value).with('test_key').and_return('')
+        expect(driver.output_parameter_empty?('test_key')).to eq(true)
+      end
+    end
+  end
+
+  describe '#validate_create_output_parameters!' do
+    let(:server_id)   { double('server_id', value: 'server-12345') }
+    let(:ip_address)  { double('ip_address', value: '1.2.3.4') }
+
+    context 'when the output parameters do not include server_id and ip_address' do
+      let(:output_parameters) { {} }
+      it_behaves_like 'output parameters that are missing a required key'
+    end
+
+    context 'when the output parameters do not include server_id' do
+      let(:output_parameters) { { 'ip_address' => ip_address } }
+      it_behaves_like 'output parameters that are missing a required key'
+    end
+
+    context 'when the output parameters do not include ip_address' do
+      let(:output_parameters) { { 'server_id' => server_id } }
+      it_behaves_like 'output parameters that are missing a required key'
+    end
+
+    context 'when server_id is empty' do
+      let(:server_id) { double('server_id', value: '') }
+      let(:output_parameters) do
+        {
+          'server_id'  => server_id,
+          'ip_address' => ip_address
+        }
+      end
+
+      it 'raises an exception' do
+        allow(driver).to receive(:output_parameters).and_return(output_parameters)
+        expect { driver.validate_create_output_parameters! }.to raise_error(
+          RuntimeError,
+          'The server_id parameter was empty.'
+        )
+      end
+    end
+
+    context 'when ip_address is empty' do
+      let(:ip_address) { double('ip_address', value: '') }
+      let(:output_parameters) do
+        {
+          'server_id'  => server_id,
+          'ip_address' => ip_address
+        }
+      end
+
+      it 'raises an exception' do
+        allow(driver).to receive(:output_parameters).and_return(output_parameters)
+        expect { driver.validate_create_output_parameters! }.to raise_error(
+          RuntimeError,
+          'The ip_address parameter was empty.'
+        )
+      end
+    end
+  end
+
+  describe '#workflow_successful?' do
+    let(:vro_client) { double('vro_client') }
+    let(:token)      { double('token') }
+    before do
+      allow(driver).to receive(:vro_client).and_return(vro_client)
+      allow(vro_client).to receive(:token).and_return(token)
+    end
+
+    context 'when the state is completed' do
+      it 'returns true' do
+        allow(token).to receive(:state).and_return('completed')
+        expect(driver.workflow_successful?).to eq(true)
+      end
+    end
+
+    context 'when the state is failed' do
+      it 'returns true' do
+        allow(token).to receive(:state).and_return('failed')
+        expect(driver.workflow_successful?).to eq(false)
+      end
     end
   end
 end
