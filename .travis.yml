@@ -1,18 +1,15 @@
 language: ruby
 cache: bundler
 sudo: false
-
 rvm:
 - 2.1
 - 2.2
-
 branches:
   only:
-    - master
-
+  - master
 notifications:
   slack:
     on_success: change
     on_failure: always
     rooms:
-      secure: iESaLLqy5RK9os0fB83vXF0DgmMaWE8/tuhEg6rL6m2YlHq+mHwT5Hoc+YIFHbzl4PXS07i99ICFpGiUXuyHSn0jrNrI4z4BRA+3EZ+DLmhHGis3znWZJ1SxrCjYCZazj0SFG49mwaZjeggQNafPm/++sqzVVI5zJuLx+92Dwuztr4sa20Oa2UOKtCsgkNojmNwTKNqlN+bh+/pX7IH5rVUDMkd3k8Sdrd8Jk0AblztGvXJO/Sn+L6Ud9NAb38bVkC7Pw8Zows6Icw4ioCIwH4tl/AI6NwfvHJu33UqoEZu/8aBkSvgjGi+hTaztcwK9xMpK70AZlYEqNS4bVTAw/otAbw+xnqWUQfL3Kc2MjSpxdiLDXhELtV9jV/VlnDwX3L79B0sICKFdcLHrG8I4tMgCDxYTNjUHY+UcccHrPsYwXn01lkCc6Pa7LZnCqS69/2vVfdb8i2LOaEvMvj9uLeeADu2EHeqM0VV1Y58dRCef7Ls8cOiOZEqghG24H1Cu26vHKamLUMZu0ctYOOmxGP159j1iwCkygb2k10BXTGdFuMch3GE3RfwaPFk8UZoY+0tQNP5OGiHhhLyLo16yxXQuDyHq5kkSMuhT/34kdY2cZuJAi8U79YJkNb29CGPUeBJ1QqXulYg/xPKW03FBWxpbkPjdPr9WTbpMGOlhBwc=
+      secure: DDrKE+td2eGF7eAPuESBcOoRAnzY/faXrX+HvM+Zpgke9ZE8y+ICYfkzr/DllQBIvIRrtwJgq5cPeBRH4hjgyACjv5HhJDR84KNL+apR6IGi+Z0LevS2DWaNaFWc5AEus5PdybRSHwHshQGl8k9s/HAnUAzuazPwZZNdCviuLMPViokX2r3+ecNM85psXHPC64Wxm3PhZzXXW+TsPgWG5mIgx2XriHxgnd7V/cBKA+6ldye27CaB2o9MS5uEFlfZj2PhqCRcBxvi82siziOnDyLjPxkjvNVPPf/QB4Lr+Zzi6rl7Gg1/qFoM83XuckfYbLUczYKYMOKjhkhBFvkzeJRUpRjK0TEZx3fRZ4we4PonprE66zZ1vAnOv/yHW26nKtUiMAZ+TCU8SAEgmAfHEiVazjvE9Ev+wbbsQtVskoVbnw1EJJwyKbVzMNCyZ4fVD6r6vBNFo2IWjL+6DJ21wMjR32a92DWYprGpkbwAaNzYe1zjPZsfAy/6JhW6Hd5qFgyEsq4ZjVDu3ELl2iN3B6DlCZEFyM/yrYCv9jlBZk6htkE3v3uXZOmld1Uxs636IQfYyRnY4BqnyYAxM7z88+N1LrOTXKj7RLLFF0WEWA9kOKvPiuQ3K+BOb0tv0hwulZJGXkeT1QKZtyItj5qSMeZvnVx+b1Y/b+5G5v09C+g=
