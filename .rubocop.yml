@@ -6,6 +6,9 @@ Metrics/LineLength:
   Max: 130
 Metrics/MethodLength:
   Max: 25
+Metrics/BlockLength:
+  Exclude:
+  - 'spec/vro_spec.rb'
 Style/Documentation:
   Enabled: false
 Style/SignalException:

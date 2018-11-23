@@ -1,4 +1,5 @@
 # Encoding: UTF-8
+
 #
 # Authors:: Chef Partner Engineering (<partnereng@chef.io>)
 # Copyright:: Copyright (c) 2015 Chef Software, Inc.
@@ -56,8 +57,7 @@ describe Kitchen::Driver::Vro do
                     logger:    logger,
                     transport: transport,
                     platform:  platform,
-                    to_str:    'instance_str'
-                   )
+                    to_str:    'instance_str')
   end
 
   before do
@@ -291,7 +291,8 @@ describe Kitchen::Driver::Vro do
         allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
         expect { driver.wait_for_workflow }.to raise_error(
           Timeout::Error, 'Workflow did not complete in 300 seconds. ' \
-          'Please check the vRO UI for more information.')
+          'Please check the vRO UI for more information.'
+        )
       end
     end
 
