@@ -161,11 +161,13 @@ describe Kitchen::Driver::Vro do
         'ip_address' => ip_address
       }
     end
+    let(:vro_client) { double('vro_client') }
 
     before do
       allow(driver).to receive(:set_workflow_vars)
       allow(driver).to receive(:set_workflow_parameters)
       allow(driver).to receive(:execute_workflow)
+      allow(driver).to receive(:vro_client).and_return(vro_client)
       allow(driver).to receive(:wait_for_workflow)
       allow(driver).to receive(:workflow_successful?).and_return(true)
       allow(driver).to receive(:validate_create_output_parameters!)
@@ -184,6 +186,7 @@ describe Kitchen::Driver::Vro do
 
     it 'raises an error if the workflow did not complete successfully' do
       allow(driver).to receive(:workflow_successful?).and_return(false)
+      allow(vro_client).to receive(:log)
       expect { driver.execute_create_workflow(state) }.to raise_error(RuntimeError)
     end
 
@@ -222,6 +225,7 @@ describe Kitchen::Driver::Vro do
 
     it 'raises an error if the workflow did not complete successfully' do
       allow(driver).to receive(:workflow_successful?).and_return(false)
+      allow(vro_client).to receive(:log)
       expect { driver.execute_destroy_workflow(state) }.to raise_error(RuntimeError)
     end
   end

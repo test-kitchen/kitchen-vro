@@ -97,7 +97,7 @@ module Kitchen
         execute_workflow
         wait_for_workflow
 
-        raise 'The workflow did not complete successfully. Check the vRO UI for more info.' unless workflow_successful?
+        raise vro_client.log.to_s unless workflow_successful?
 
         validate_create_output_parameters!
 
@@ -112,7 +112,7 @@ module Kitchen
         execute_workflow
         wait_for_workflow
 
-        raise 'The workflow did not complete successfully. Check the vRO UI for more info.' unless workflow_successful?
+        raise vro_client.log.to_s unless workflow_successful?
       end
 
       def execute_workflow
