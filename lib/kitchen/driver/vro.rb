@@ -16,9 +16,9 @@
 # limitations under the License.
 #
 
-require 'kitchen'
-require 'vcoworkflows'
-require_relative 'vro_version'
+require "kitchen"
+require "vcoworkflows"
+require_relative "vro_version"
 
 module Kitchen
   module Driver
@@ -42,13 +42,13 @@ module Kitchen
       default_config :request_timeout, 300
 
       def name
-        'vRO'
+        "vRO"
       end
 
       def create(state)
         return unless state[:server_id].nil?
 
-        info('Executing the create-server workflow...')
+        info("Executing the create-server workflow...")
         execute_create_workflow(state)
 
         info("Server #{state[:hostname]} (#{state[:server_id]}) created.  Waiting for it to be ready...")
@@ -97,22 +97,22 @@ module Kitchen
         execute_workflow
         wait_for_workflow
 
-        raise 'The workflow did not complete successfully. Check the vRO UI for more info.' unless workflow_successful?
+        raise "The workflow did not complete successfully. Check the vRO UI for more info." unless workflow_successful?
 
         validate_create_output_parameters!
 
-        state[:server_id] = output_parameter_value('server_id')
-        state[:hostname]  = output_parameter_value('ip_address')
+        state[:server_id] = output_parameter_value("server_id")
+        state[:hostname]  = output_parameter_value("ip_address")
       end
 
       def execute_destroy_workflow(state)
         set_workflow_vars(config[:destroy_workflow_name], config[:destroy_workflow_id])
         set_workflow_parameters(config[:destroy_workflow_parameters])
-        vro_client.parameter('server_id', state[:server_id])
+        vro_client.parameter("server_id", state[:server_id])
         execute_workflow
         wait_for_workflow
 
-        raise 'The workflow did not complete successfully. Check the vRO UI for more info.' unless workflow_successful?
+        raise "The workflow did not complete successfully. Check the vRO UI for more info." unless workflow_successful?
       end
 
       def execute_workflow
@@ -166,15 +166,15 @@ module Kitchen
       end
 
       def validate_create_output_parameters!
-        raise 'The workflow output did not contain a server_id and ip_address parameter.' unless
-          output_parameters.key?('server_id') && output_parameters.key?('ip_address')
+        raise "The workflow output did not contain a server_id and ip_address parameter." unless
+          output_parameters.key?("server_id") && output_parameters.key?("ip_address")
 
-        raise 'The server_id parameter was empty.' if output_parameter_empty?('server_id')
-        raise 'The ip_address parameter was empty.' if output_parameter_empty?('ip_address')
+        raise "The server_id parameter was empty." if output_parameter_empty?("server_id")
+        raise "The ip_address parameter was empty." if output_parameter_empty?("ip_address")
       end
 
       def workflow_successful?
-        vro_client.token.state == 'completed'
+        vro_client.token.state == "completed"
       end
     end
   end

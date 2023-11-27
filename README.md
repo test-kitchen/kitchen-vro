@@ -19,15 +19,21 @@ gem 'kitchen-vro'
 
 And then execute:
 
-    $ bundle
+```shell
+bundle
+```
 
 Or install it yourself as:
 
-    $ gem install kitchen-vro
+```shell
+gem install kitchen-vro
+```
 
 Or even better, install it via ChefDK:
 
-    $ chef gem install kitchen-vro
+```shell
+chef gem install kitchen-vro
+```
 
 ## Usage
 
@@ -43,21 +49,21 @@ driver:
 
 Additionally, the following parameters are required, either globally or per-platform:
 
- * **create_workflow_name**: The name of the vRO workflow to execute to create a server.
- * **destroy_workflow_name**: The name of the vRO workflow to execute to destroy a server.
+* **create_workflow_name**: The name of the vRO workflow to execute to create a server.
+* **destroy_workflow_name**: The name of the vRO workflow to execute to destroy a server.
 
 There are a number of optional parameters you can configure as well:
 
- * **create_workflow_id**: If your create workflow name is not unique within vRO, you can use
+* **create_workflow_id**: If your create workflow name is not unique within vRO, you can use
    this parameter to specify the workflow unique ID.
- * **destroy_workflow_id**: If your destroy workflow name is not unique within vRO, you can use
+* **destroy_workflow_id**: If your destroy workflow name is not unique within vRO, you can use
    this parameter to specify the workflow unique ID.
- * **create_workflow_parameters**: A hash of key-value pairs of parameters to pass to your
+* **create_workflow_parameters**: A hash of key-value pairs of parameters to pass to your
    create workflow.
- * **destroy_workflow_parameters**: A hash of key-value pairs of parameters to pass to your
+* **destroy_workflow_parameters**: A hash of key-value pairs of parameters to pass to your
    destroy workflow.
- * **request_timeout**: Number of seconds to wait for a vRO workflow to execute.  Default: 300
- * **vro_disable_ssl_verify**: Disable SSL validation.  Default: false
+* **request_timeout**: Number of seconds to wait for a vRO workflow to execute.  Default: 300
+* **vro_disable_ssl_verify**: Disable SSL validation.  Default: false
 
 An example `.kitchen.yml` that uses a combination of global and per-platform
 settings might look like this:
@@ -93,20 +99,20 @@ they must meet the following requirements.
 
 ### Create Workflow
 
- * Must contain an output parameter called `ip_address` that Test Kitchen can
+* Must contain an output parameter called `ip_address` that Test Kitchen can
    connect to in order to bootstrap and test your node.
- * Must contain an output parameter called `server_id` that is a unique ID of
+* Must contain an output parameter called `server_id` that is a unique ID of
    the server created.  Test Kitchen will provide this value to the Destroy
    Workflow in order to request the destruction of the server once testing is
    complete.
- * Must end the workflow with a raised exception if the creation did not
+* Must end the workflow with a raised exception if the creation did not
    succeed.  The workflow status must not be 'completed.'
 
 ### Destroy Workflow
 
- * Must contain an input parameter called `server_id` that Test Kitchen will
+* Must contain an input parameter called `server_id` that Test Kitchen will
    populate with the unique ID returned from the Create Workflow output.
- * Must end the workflow with a raised exception if the creation did not
+* Must end the workflow with a raised exception if the creation did not
      succeed.  The workflow status must not be 'completed.'
 
 ## License and Authors
@@ -120,7 +126,7 @@ License:: Apache License, Version 2.0
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the License at
 
-```
+```text
 http://www.apache.org/licenses/LICENSE-2.0
 ```
 
@@ -133,7 +139,7 @@ and limitations under the License.
 
 We'd love to hear from you if this doesn't perform in the manner you expect. Please log a GitHub issue, or even better, submit a Pull Request with a fix!
 
-1. Fork it ( https://github.com/chef-partners/kitchen-vro/fork )
+1. Fork it ( <https://github.com/chef-partners/kitchen-vro/fork> )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
