@@ -18,7 +18,7 @@
 
 require "kitchen"
 require "vcoworkflows"
-require_relative "vro_version"
+require_relative "version"
 
 module Kitchen
   module Driver
