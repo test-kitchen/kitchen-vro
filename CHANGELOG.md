@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.0...v1.2.0) (2024-04-10)
+
+
+### Miscellaneous Chores
+
+* release 1.2.0 ([#18](https://github.com/test-kitchen/kitchen-vro/issues/18)) ([3356c6f](https://github.com/test-kitchen/kitchen-vro/commit/3356c6f22b91c02283ec4d31a7ac6179ecd27876))
+
 ## [1.2.0](https://github.com/test-kitchen/kitchen-vro/compare/v1.1.0...v1.2.0) (2024-02-28)
 
 
