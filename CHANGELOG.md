@@ -1,5 +1,12 @@
 # VRO Changelog
 
+## [1.2.2](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.1...v1.2.2) (2024-06-19)
+
+
+### Bug Fixes
+
+* release please deprecation ([#25](https://github.com/test-kitchen/kitchen-vro/issues/25)) ([2fc4da5](https://github.com/test-kitchen/kitchen-vro/commit/2fc4da56e566b52d631f5ccbf661131f14609c13))
+
 ## [1.2.1](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.1...v1.2.1) (2024-06-09)
 
 
