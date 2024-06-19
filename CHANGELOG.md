@@ -1,4 +1,4 @@
-# Changelog
+# VRO Changelog
 
 ## [1.2.1](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.1...v1.2.1) (2024-06-09)
 
