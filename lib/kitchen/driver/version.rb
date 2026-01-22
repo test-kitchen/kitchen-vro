@@ -18,6 +18,6 @@
 
 module Kitchen
   module Driver
-    VRO_VERSION = "1.2.2".freeze
+    VRO_VERSION = "1.2.3".freeze
   end
 end

@@ -1,5 +1,12 @@
 # VRO Changelog
 
+## [1.2.3](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.2...v1.2.3) (2026-01-22)
+
+
+### Bug Fixes
+
+* bump tk dep to allow tk 4 ([#29](https://github.com/test-kitchen/kitchen-vro/issues/29)) ([2a89105](https://github.com/test-kitchen/kitchen-vro/commit/2a89105a15a65c974d4f9793950c8c6ceab963c1))
+
 ## [1.2.2](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.1...v1.2.2) (2024-06-19)
 
 
