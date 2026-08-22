@@ -1,5 +1,7 @@
 # kitchen-vro
 
+[![Gem Version](https://badge.fury.io/rb/kitchen-vro.svg)](https://badge.fury.io/rb/kitchen-vro)
+
 A driver to allow Test Kitchen to consume VMware resources provisioned by
 way of vRealize Orchestrator workflows.
 
