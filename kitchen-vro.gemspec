@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "kitchen/driver/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "kitchen-vro"
+  spec.name = "kitchen-vro"
   spec.required_ruby_version = ">= 3.1"
   spec.version       = Kitchen::Driver::VRO_VERSION
   spec.authors       = ["Test Kitchen Team"]
@@ -15,7 +15,6 @@ Gem::Specification.new do |spec|
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = []
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_dependency "test-kitchen", ">= 1.4", "< 5"
