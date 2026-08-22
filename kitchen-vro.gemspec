@@ -4,6 +4,7 @@ require "kitchen/driver/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "kitchen-vro"
+  spec.required_ruby_version = ">= 3.1"
   spec.version       = Kitchen::Driver::VRO_VERSION
   spec.authors       = ["Test Kitchen Team"]
   spec.email         = ["help@sous-chefs.org"]
