@@ -8,6 +8,10 @@ group :test do
   gem "webmock",   "~> 3.0"
 end
 
+group :docs do
+  gem "yard"
+end
+
 group :cookstyle do
   gem "cookstyle"
 end

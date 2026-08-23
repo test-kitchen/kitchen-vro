@@ -16,8 +16,11 @@
 # limitations under the License.
 #
 
+# Test Kitchen's top-level namespace.
 module Kitchen
+  # Test Kitchen's driver plugins.
   module Driver
+    # The version of the kitchen-vro gem.
     VRO_VERSION = "1.2.3".freeze
   end
 end
