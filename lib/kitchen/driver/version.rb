@@ -21,6 +21,6 @@ module Kitchen
   # Test Kitchen's driver plugins.
   module Driver
     # The version of the kitchen-vro gem.
-    VRO_VERSION = "1.2.3".freeze
+    VRO_VERSION = "1.2.4".freeze
   end
 end
