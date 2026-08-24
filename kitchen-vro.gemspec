@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["help@sous-chefs.org"]
   spec.summary       = "A Test Kitchen driver for VMware vRealize Orchestrator (vRO)"
   spec.description   = spec.summary
-  spec.homepage      = "https://https://github.com/test-kitchen/kitchen-vro"
+  spec.homepage      = "https://github.com/test-kitchen/kitchen-vro"
   spec.license       = "Apache-2.0"
 
   spec.files         = `git ls-files -z`.split("\x0")
