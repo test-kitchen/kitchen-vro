@@ -64,6 +64,96 @@ describe Kitchen::Driver::Vro do
     allow(driver).to receive(:instance).and_return(instance)
   end
 
+  describe 'plugin metadata' do
+    it 'is a Test Kitchen driver' do
+      expect(driver).to be_a(Kitchen::Driver::Base)
+    end
+
+    it 'shows up as vRO in kitchen list' do
+      expect(driver.name).to eq('vRO')
+    end
+
+    it 'reports its own gem version to kitchen diagnose' do
+      expect(driver.diagnose_plugin[:version]).to eq(Kitchen::Driver::VRO_VERSION)
+    end
+  end
+
+  describe 'configuration' do
+    it 'verifies TLS by default' do
+      expect(driver[:vro_disable_ssl_verify]).to eq(false)
+    end
+
+    it 'defaults to a 300 second workflow timeout' do
+      expect(driver[:request_timeout]).to eq(300)
+    end
+
+    it 'defaults both workflow ids to nil so the name is used alone' do
+      config.delete(:create_workflow_id)
+      config.delete(:destroy_workflow_id)
+
+      expect(driver[:create_workflow_id]).to be_nil
+      expect(driver[:destroy_workflow_id]).to be_nil
+    end
+
+    it 'defaults both workflow parameter sets to empty' do
+      expect(driver[:create_workflow_parameters]).to eq({})
+      expect(driver[:destroy_workflow_parameters]).to eq({})
+    end
+
+    %i[vro_username vro_password vro_base_url
+       create_workflow_name destroy_workflow_name].each do |key|
+      it "refuses to run without #{key}" do
+        config.delete(key)
+
+        expect { driver.finalize_config!(instance) }
+          .to raise_error(Kitchen::UserError, /#{key}/)
+      end
+    end
+  end
+
+  describe '#set_workflow_vars' do
+    it 'points the driver at the named workflow' do
+      driver.set_workflow_vars('Some Workflow', 'workflow-9')
+
+      expect(driver.workflow_name).to eq('Some Workflow')
+      expect(driver.workflow_id).to eq('workflow-9')
+    end
+
+    it 'discards the memoized client so the next call builds a new one' do
+      first = double('first client')
+      allow(VcoWorkflows::Workflow).to receive(:new).and_return(first)
+      allow(driver).to receive(:vro_config).and_return(double('config'))
+      driver.set_workflow_vars('Create Workflow', 'workflow-1')
+      expect(driver.vro_client).to eq(first)
+
+      second = double('second client')
+      allow(VcoWorkflows::Workflow).to receive(:new).and_return(second)
+      driver.set_workflow_vars('Destroy Workflow', 'workflow-2')
+
+      expect(driver.vro_client).to eq(second)
+    end
+  end
+
+  describe '#workflow_successful?' do
+    let(:vro_client) { double('vro_client') }
+
+    before do
+      allow(driver).to receive(:vro_client).and_return(vro_client)
+    end
+
+    it 'is true when vRO reports the run completed' do
+      allow(vro_client).to receive(:token).and_return(double(state: 'completed'))
+
+      expect(driver.workflow_successful?).to eq(true)
+    end
+
+    it 'is false for any other state' do
+      allow(vro_client).to receive(:token).and_return(double(state: 'failed'))
+
+      expect(driver.workflow_successful?).to eq(false)
+    end
+  end
+
   describe '#create' do
     context 'when a server already exists' do
       let(:state) { { server_id: 'server-12345' } }
@@ -142,11 +232,11 @@ describe Kitchen::Driver::Vro do
 
     context 'when vro_disable_ssl_verify is false' do
       before do
-        config[:vro_disable_ssl_verify] = true
+        config[:vro_disable_ssl_verify] = false
       end
 
       it 'returns true' do
-        expect(driver.verify_ssl?).to eq(false)
+        expect(driver.verify_ssl?).to eq(true)
       end
     end
   end
