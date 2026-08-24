@@ -9,6 +9,15 @@
 * Let cookstyle decide which files to lint ([#35](https://github.com/test-kitchen/kitchen-vro/pull/35)) ([c252779](https://github.com/test-kitchen/kitchen-vro/commit/c252779))
 * Docs: rewrite README for new users and split contributor docs ([#36](https://github.com/test-kitchen/kitchen-vro/pull/36)) ([c32f1a3](https://github.com/test-kitchen/kitchen-vro/commit/c32f1a3))
 
+## [1.2.4](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.3...v1.2.4) (2026-08-24)
+
+
+### Bug Fixes
+
+* correct the doubled scheme in the gemspec homepage ([#41](https://github.com/test-kitchen/kitchen-vro/issues/41)) ([0dc7756](https://github.com/test-kitchen/kitchen-vro/commit/0dc7756b703c2cd758e842dee0725f2124682569))
+* require cookstyle/chefstyle so style checks actually run ([#43](https://github.com/test-kitchen/kitchen-vro/issues/43)) ([8b8d6b4](https://github.com/test-kitchen/kitchen-vro/commit/8b8d6b45d96ad5f436d0a947a10a15a5fac7ec4d))
+* require test-kitchen 3.0 or newer ([#39](https://github.com/test-kitchen/kitchen-vro/issues/39)) ([f54a6c9](https://github.com/test-kitchen/kitchen-vro/commit/f54a6c9dae6b681875a1ec9b5d9a0cc8efd0bd97))
+
 ## [1.2.3](https://github.com/test-kitchen/kitchen-vro/compare/v1.2.2...v1.2.3) (2026-01-22)
 
 ### Bug Fixes
