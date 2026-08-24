@@ -17,6 +17,6 @@ Gem::Specification.new do |spec|
   spec.executables   = []
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "test-kitchen", ">= 1.4", "< 5"
+  spec.add_dependency "test-kitchen", ">= 3.0", "< 5"
   spec.add_dependency "vcoworkflows", "~> 0.2"
 end
