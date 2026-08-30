@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+require "timeout" unless defined?(Timeout)
+
 require "kitchen"
 require "vcoworkflows"
 require_relative "version"
@@ -87,14 +89,27 @@ module Kitchen
 
       # Runs the destroy workflow for the server named in state.
       #
-      # @param state [Hash] instance state naming the server
+      # Clears +server_id+ and +hostname+ afterwards. Test Kitchen persists
+      # the state hash even when an action fails, so leaving a destroyed
+      # server named in it means the next +kitchen destroy+ runs the destroy
+      # workflow again against a machine that is already gone.
+      #
+      # @param state [Hash] mutable instance state naming the server; loses
+      #   +server_id+ and +hostname+
       # @return [void]
       def destroy(state)
         return if state[:server_id].nil?
 
-        info("Executing the destroy-server workflow for #{state[:hostname]} (#{state[:server_id]})...")
+        server_id = state[:server_id]
+        hostname  = state[:hostname]
+
+        info("Executing the destroy-server workflow for #{hostname} (#{server_id})...")
         execute_destroy_workflow(state)
-        info("Server #{state[:hostname]} (#{state[:server_id]}) destroyed.")
+
+        state.delete(:server_id)
+        state.delete(:hostname)
+
+        info("Server #{hostname} (#{server_id}) destroyed.")
       end
 
       # Connection settings for the vRO API.
@@ -131,16 +146,20 @@ module Kitchen
 
       # Points the driver at a different workflow.
       #
-      # Clears the memoized client, which is what makes it safe to run the
-      # destroy workflow after the create workflow in the same process.
+      # Clears the memoized client and the memoized output parameters, which
+      # is what makes it safe to run the destroy workflow after the create
+      # workflow in the same process. Without the second reset, anything
+      # reading {#output_parameters} after the switch would still be looking
+      # at the previous workflow's output.
       #
       # @param name [String] workflow name
       # @param id [String, nil] workflow id, when the name is ambiguous
       # @return [void]
       def set_workflow_vars(name, id)
-        @vro_client    = nil
-        @workflow_name = name
-        @workflow_id   = id
+        @vro_client        = nil
+        @output_parameters = nil
+        @workflow_name     = name
+        @workflow_id       = id
       end
 
       # Runs the create workflow and records what it produced.
@@ -221,17 +240,26 @@ module Kitchen
       # @return [void]
       def wait_for_server(state)
         instance.transport.connection(state).wait_until_ready
-      rescue
+      rescue => e
         error("Server #{state[:hostname]} (#{state[:server_id]}) not reachable. Destroying server...")
-        destroy(state)
-        raise
+
+        begin
+          destroy(state)
+        rescue => destroy_error
+          # Report the leaked machine, but keep the connection failure as the
+          # error that surfaces -- it is the one that explains the run.
+          error("The destroy-server workflow also failed: #{destroy_error.message}. " \
+                "The server may still exist; check the vRO UI.")
+        end
+
+        raise e
       end
 
       # Sets input parameters on the current workflow.
       #
       # @param data [Hash] parameter names to values; names are stringified
       # @return [void]
-      def set_workflow_parameters(data) # rubocop:disable Style/AccessorMethodName
+      def set_workflow_parameters(data) # rubocop:disable Naming/AccessorMethodName
         data.each do |key, value|
           vro_client.parameter(key.to_s, value)
         end
@@ -245,15 +273,19 @@ module Kitchen
       end
 
       # @param key [String] output parameter name
-      # @return [String] the parameter's value, stringified
+      # @return [String] the parameter's value, stringified; an empty string
+      #   when the workflow did not return that parameter at all
       def output_parameter_value(key)
-        output_parameters[key].value.to_s
+        parameter = output_parameters[key]
+        return "" if parameter.nil?
+
+        parameter.value.to_s
       end
 
       # @param key [String] output parameter name
       # @return [Boolean] true when the parameter is missing or empty
       def output_parameter_empty?(key)
-        output_parameter_value(key).nil? || output_parameter_value(key).empty?
+        output_parameter_value(key).empty?
       end
 
       # Checks that the create workflow returned what the driver needs.
