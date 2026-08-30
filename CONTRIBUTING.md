@@ -40,7 +40,7 @@ bundle exec rake style   # Cookstyle / RuboCop
 To run a single spec file:
 
 ```sh
-bundle exec rspec spec/kitchen/driver/vro_spec.rb
+bundle exec rspec spec/vro_spec.rb
 ```
 
 Many style offenses can be corrected automatically:
