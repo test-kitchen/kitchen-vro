@@ -13,6 +13,11 @@ end
 
 RSpec::Core::RakeTask.new(:test)
 
+desc "Exercise the driver through Test Kitchen itself (no vRO appliance needed)"
+task :integration do
+  ruby File.join(__dir__, "test", "kitchen_smoke.rb")
+end
+
 task default: %i{test style}
 
 begin

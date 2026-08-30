@@ -52,6 +52,27 @@ bundle exec cookstyle -a
 The unit tests stub the vRO client, so they do not contact an appliance and do
 not require credentials.
 
+### Integration check
+
+```sh
+bundle exec rake integration
+```
+
+This drives the driver through Test Kitchen itself, using the `kitchen.yml` in
+the repository root. It builds every instance that file describes, so it
+checks the things unit tests cannot: that Test Kitchen discovers the plugin by
+the name people write in their `kitchen.yml`, that the gemspec ships the files
+it needs, that `required_config` rejects an incomplete configuration, that
+`default_config` resolves to the defaults the README documents, and that
+`kitchen list` and `kitchen diagnose` work against it.
+
+It needs no vRO appliance and no credentials -- everything it does stops short
+of contacting one. It runs on every pull request.
+
+To point the same `kitchen.yml` at a real appliance, set `VRO_BASE_URL`,
+`VRO_USERNAME`, `VRO_PASSWORD`, `VRO_CREATE_WORKFLOW`, and
+`VRO_DESTROY_WORKFLOW`, then run `kitchen` normally.
+
 ### Manual testing against vRO
 
 Changes that touch workflow execution or parameter handling should also be

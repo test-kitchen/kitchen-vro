@@ -9,3 +9,5 @@
 /tmp/
 doc/
 .yardoc
+/.kitchen/
+/.kitchen.local.yml
