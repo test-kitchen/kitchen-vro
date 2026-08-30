@@ -192,6 +192,17 @@ RSpec.describe Kitchen::Driver::Vro do
       expect(driver.workflow_id).to be_nil
     end
 
+    it "discards the memoized output parameters so they cannot leak between workflows" do
+      create_token = workflow_token(output: { "server_id" => "server-12345" })
+      allow(driver).to receive(:vro_client).and_return(workflow_client(token: create_token))
+      expect(driver.output_parameters.keys).to eq(["server_id"])
+
+      driver.set_workflow_vars("Destroy Workflow", "workflow-2")
+      allow(driver).to receive(:vro_client).and_return(workflow_client(token: workflow_token))
+
+      expect(driver.output_parameters).to be_empty
+    end
+
     it "discards the memoized client so the next call builds a new one" do
       first  = workflow_client
       second = workflow_client
@@ -282,6 +293,31 @@ RSpec.describe Kitchen::Driver::Vro do
       expect(driver).not_to receive(:execute_destroy_workflow)
 
       driver.destroy({})
+    end
+
+    it "clears the destroyed server out of state" do
+      allow(driver).to receive(:execute_destroy_workflow)
+
+      driver.destroy(state)
+
+      expect(state).not_to have_key(:server_id)
+      expect(state).not_to have_key(:hostname)
+    end
+
+    it "leaves state alone when the destroy workflow fails" do
+      allow(driver).to receive(:execute_destroy_workflow).and_raise(RuntimeError)
+
+      expect { driver.destroy(state) }.to raise_error(RuntimeError)
+      expect(state[:server_id]).to eq("server-12345")
+    end
+
+    it "does not run the destroy workflow twice for the same server" do
+      allow(driver).to receive(:execute_destroy_workflow)
+
+      driver.destroy(state)
+      driver.destroy(state)
+
+      expect(driver).to have_received(:execute_destroy_workflow).once
     end
 
     context "with the vRO API stubbed end to end" do
@@ -545,6 +581,29 @@ RSpec.describe Kitchen::Driver::Vro do
       expect { driver.wait_for_server(state) }
         .to raise_error(Kitchen::Transport::TransportFailed, "connection refused")
     end
+
+    context "when the cleanup destroy also fails" do
+      before do
+        allow(connection).to receive(:wait_until_ready)
+          .and_raise(Kitchen::Transport::TransportFailed, "connection refused")
+        allow(driver).to receive(:destroy).and_raise(RuntimeError, "vRO rejected the request")
+      end
+
+      it "still surfaces the connection failure, not the cleanup failure" do
+        allow(driver).to receive(:error)
+
+        expect { driver.wait_for_server(state) }
+          .to raise_error(Kitchen::Transport::TransportFailed, "connection refused")
+      end
+
+      it "warns that the server may have been left behind" do
+        expect(driver).to receive(:error).with(/not reachable/)
+        expect(driver).to receive(:error).with(/destroy-server workflow also failed/)
+
+        expect { driver.wait_for_server(state) }
+          .to raise_error(Kitchen::Transport::TransportFailed)
+      end
+    end
   end
 
   describe "#set_workflow_parameters" do
@@ -622,23 +681,38 @@ RSpec.describe Kitchen::Driver::Vro do
 
       expect(driver.output_parameter_value("ip_address")).to eq("")
     end
+
+    it "returns an empty string for a parameter the workflow never returned" do
+      allow(driver).to receive(:output_parameters).and_return({})
+
+      expect(driver.output_parameter_value("ip_address")).to eq("")
+    end
   end
 
   describe "#output_parameter_empty?" do
     it "is false when the value is neither nil nor empty" do
-      allow(driver).to receive(:output_parameter_value).with("test_key").and_return("test_value")
+      allow(driver).to receive(:output_parameters)
+        .and_return(workflow_output("test_key" => "test_value"))
 
       expect(driver.output_parameter_empty?("test_key")).to be false
     end
 
-    it "is true when the value is nil" do
-      allow(driver).to receive(:output_parameter_value).with("test_key").and_return(nil)
+    it "is true when vRO returned the parameter unset" do
+      allow(driver).to receive(:output_parameters)
+        .and_return(workflow_output("test_key" => nil))
 
       expect(driver.output_parameter_empty?("test_key")).to be true
     end
 
     it "is true when the value is empty" do
-      allow(driver).to receive(:output_parameter_value).with("test_key").and_return("")
+      allow(driver).to receive(:output_parameters)
+        .and_return(workflow_output("test_key" => ""))
+
+      expect(driver.output_parameter_empty?("test_key")).to be true
+    end
+
+    it "is true when the workflow did not return the parameter at all" do
+      allow(driver).to receive(:output_parameters).and_return({})
 
       expect(driver.output_parameter_empty?("test_key")).to be true
     end
