@@ -1,0 +1,23 @@
+---
+# A deliberately incomplete configuration: create_workflow_name is missing.
+# Test Kitchen must refuse to build the instance rather than getting as far as
+# calling vRO with nothing to run. CI asserts that `kitchen list` fails
+# against this file -- see .github/workflows/lint.yaml.
+driver:
+  name: vro
+  vro_base_url: https://vro.example.com:8281
+  vro_username: kitchen@example.com
+  vro_password: not-a-real-password
+  destroy_workflow_name: Destroy TK Server
+
+provisioner:
+  name: shell
+
+verifier:
+  name: shell
+
+platforms:
+  - name: defaults
+
+suites:
+  - name: default

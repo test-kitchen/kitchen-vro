@@ -1,0 +1,67 @@
+---
+# This is not a live test environment. kitchen-vro drives a real vRealize
+# Orchestrator appliance running workflows you supply, and CI has no access to
+# one, so nothing here can be created or converged without credentials.
+#
+# What it is for: exercising the driver through Test Kitchen itself rather
+# than through RSpec. `kitchen list` and `kitchen diagnose` load the plugin
+# the way a user's Test Kitchen does -- discovering it by name, running
+# required_config validation, applying default_config, and parsing every
+# documented option -- which catches plugin API breakage, a bad require, and
+# a gemspec that forgot a file. None of that is visible to unit tests that
+# instantiate the driver class directly.
+#
+# Point it at a real appliance by setting VRO_BASE_URL, VRO_USERNAME,
+# VRO_PASSWORD, VRO_CREATE_WORKFLOW and VRO_DESTROY_WORKFLOW. See
+# CONTRIBUTING.md.
+
+driver:
+  name: vro
+  vro_base_url: <%= ENV.fetch("VRO_BASE_URL", "https://vro.example.com:8281") %>
+  vro_username: <%= ENV.fetch("VRO_USERNAME", "kitchen@example.com") %>
+  vro_password: <%= ENV.fetch("VRO_PASSWORD", "not-a-real-password") %>
+  create_workflow_name: <%= ENV.fetch("VRO_CREATE_WORKFLOW", "Create TK Server") %>
+  destroy_workflow_name: <%= ENV.fetch("VRO_DESTROY_WORKFLOW", "Destroy TK Server") %>
+
+provisioner:
+  name: shell
+
+verifier:
+  name: shell
+
+# One platform per documented configuration shape, so that a change to how the
+# driver reads config shows up here as a load or validation failure.
+platforms:
+  # Nothing but the required options: proves the defaults apply.
+  - name: defaults
+
+  # Workflows addressed by id as well as name, for ambiguous workflow names.
+  - name: workflow-ids
+    driver:
+      create_workflow_id: 9f4d4a7e-1234-4b8b-9c2f-77b6c9f0e111
+      destroy_workflow_id: 3a1b2c3d-5678-4e9f-8a1b-22c4d6e8f0a1
+
+  # Input parameters for both workflows, including non-string values.
+  - name: workflow-parameters
+    driver:
+      create_workflow_parameters:
+        os_name: centos
+        os_version: "9"
+        cpus: 4
+        memory: 4096
+      destroy_workflow_parameters:
+        force: true
+        reason: test-kitchen cleanup
+
+  # A build that takes longer than the default five minutes.
+  - name: slow-workflows
+    driver:
+      request_timeout: 1800
+
+  # A lab appliance with a self-signed certificate.
+  - name: self-signed-cert
+    driver:
+      vro_disable_ssl_verify: true
+
+suites:
+  - name: default
