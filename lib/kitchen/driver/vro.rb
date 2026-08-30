@@ -40,12 +40,32 @@ module Kitchen
     #
     # @see https://www.vmware.com/products/vrealize-orchestrator.html vRealize Orchestrator
     class Vro < Kitchen::Driver::Base
-      # @!attribute [rw] workflow_name
-      #   @return [String] name of the workflow currently being run
-      # @!attribute [rw] workflow_id
-      #   @return [String, nil] id of the workflow currently being run, used
-      #     to disambiguate when several workflows share a name
-      attr_accessor :workflow_name, :workflow_id
+      # Reader and writer are declared separately rather than as one
+      # attr_accessor so that each direction can carry its own tags: YARD
+      # shares a single docstring between the two halves of an accessor, and
+      # a @param on that shared docstring is a tag the reader cannot have.
+
+      # @return [String] name of the workflow currently being run
+      attr_reader :workflow_name
+
+      # Prefer {#set_workflow_vars}, which also clears the memoized client and
+      # output parameters. Setting this on its own leaves both pointing at the
+      # previous workflow.
+      #
+      # @param value [String] name of the workflow to run next
+      # @return [String] the name just set
+      attr_writer :workflow_name
+
+      # @return [String, nil] id of the workflow currently being run, used
+      #   to disambiguate when several workflows share a name
+      attr_reader :workflow_id
+
+      # Prefer {#set_workflow_vars}, for the same reason as {#workflow_name=}.
+      #
+      # @param value [String, nil] id of the workflow to run next, or nil when
+      #   the name alone identifies it
+      # @return [String, nil] the id just set
+      attr_writer :workflow_id
 
       kitchen_driver_api_version 2
       plugin_version Kitchen::Driver::VRO_VERSION
